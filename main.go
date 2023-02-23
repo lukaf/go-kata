@@ -1,13 +1,16 @@
 package main
 
-import "fmt"
-import "math"
+import (
+	"fmt"
+	"math"
+	"os"
+)
 
 func challenge1() {
 	fmt.Println(int(math.Pow(2, 38)))
 }
 
-func main() {
+func challenge2() {
 	const min = int('a')
 	const max = int('z')
 
@@ -28,4 +31,42 @@ func main() {
 	}
 
 	fmt.Println(string(output))
+}
+
+func challenge3() {
+	// http://www.pythonchallenge.com/pc/def/ocr.html
+	const datafile string = "data.txt"
+	data, err := os.ReadFile(datafile)
+	if err != nil {
+		panic(err)
+	}
+
+	type counter struct {
+		index int
+		count int
+	}
+	characterCount := map[rune]counter{}
+	for i, r := range string(data) {
+		value, ok := characterCount[r]
+		if ok == false {
+			characterCount[r] = counter{index: i, count: 0}
+		}
+		value.count++
+		characterCount[r] = value
+	}
+	unorderedCharacterCount := []counter{}
+	for _, v := range characterCount {
+		if v.count == 1 {
+			unorderedCharacterCount = append(unorderedCharacterCount, v)
+		}
+	}
+	// TODO: Sort the `unorderedCharacterCount` with interface
+}
+
+func challenge4() {
+	// http://www.pythonchallenge.com/pc/def/equality.html
+}
+
+func main() {
+	challenge3()
 }
