@@ -2,15 +2,19 @@ package main
 
 import (
 	"fmt"
+	"io"
 	"math"
+	"net/http"
 	"os"
+	"regexp"
+	"strconv"
 )
 
-func challenge1() {
+func challenge0() {
 	fmt.Println(int(math.Pow(2, 38)))
 }
 
-func challenge2() {
+func challenge1() {
 	const min = int('a')
 	const max = int('z')
 
@@ -33,7 +37,7 @@ func challenge2() {
 	fmt.Println(string(output))
 }
 
-func challenge3() {
+func challenge2() {
 	// http://www.pythonchallenge.com/pc/def/ocr.html
 	const datafile string = "data.txt"
 	data, err := os.ReadFile(datafile)
@@ -63,10 +67,54 @@ func challenge3() {
 	// TODO: Sort the `unorderedCharacterCount` with interface
 }
 
-func challenge4() {
+func challenge3() {
 	// http://www.pythonchallenge.com/pc/def/equality.html
+	const datafile string = "bodyguard.txt"
+	data, err := os.ReadFile(datafile)
+	if err != nil {
+		panic(err)
+	}
+	output := []byte{}
+
+	var re = regexp.MustCompile(`[^A-Z][A-Z]{3}(?P<foo>[a-z])[A-Z]{3}[^A-Z]`)
+
+	for _, match := range re.FindAllSubmatch(data, -1) {
+		output = append(output, match[1]...)
+	}
+
+	fmt.Println(string(output))
+}
+
+func challenge4() {
+	url := "http://www.pythonchallenge.com/pc/def/linkedlist.php?nothing="
+	nothing := "91706"
+	re := regexp.MustCompile(`and the next nothing is (\d+)`)
+
+	for {
+		uri := url + nothing
+		response, err := http.Get(uri)
+		if err != nil {
+			break
+		}
+		defer response.Body.Close()
+
+		body, err := io.ReadAll(response.Body)
+		fmt.Println(string(body))
+
+		if string(body) == "Yes. Divide by two and keep going." {
+			nothingInt, err := strconv.Atoi(nothing)
+			if err == nil {
+				nothing = fmt.Sprintf("%v", nothingInt/2)
+			}
+		} else {
+			if err == nil {
+				match := re.FindAllSubmatch(body, 1)
+				nothing = string(match[0][1])
+			}
+		}
+	}
 }
 
 func main() {
-	challenge3()
+	challenge4()
 }
