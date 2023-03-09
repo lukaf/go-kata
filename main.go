@@ -8,6 +8,10 @@ import (
 	"os"
 	"regexp"
 	"strconv"
+	"strings"
+
+	"github.com/nlpodyssey/gopickle/pickle"
+	"github.com/nlpodyssey/gopickle/types"
 )
 
 func challenge0() {
@@ -115,6 +119,32 @@ func challenge4() {
 	}
 }
 
+func challenge5() {
+	// http://www.pythonchallenge.com/pc/def/peak.html
+	// todo: get the banner.p from http://www.pythonchallenge.com/pc/def/banner.p
+	foo, err := pickle.Load("banner.p")
+	if err != nil {
+		panic(err)
+	}
+
+	lines := foo.(*types.List)
+
+	for line := 0; line < lines.Len(); line++ {
+
+		tuple_list := lines.Get(line).(*types.List)
+		for tuple := 0; tuple < tuple_list.Len(); tuple++ {
+			t := tuple_list.Get(tuple).(*types.Tuple)
+			fmt.Printf("%s", strings.Repeat(t.Get(0).(string), t.Get(1).(int)))
+		}
+
+		fmt.Printf("\n")
+	}
+}
+
+func challenge6() {
+	// http://www.pythonchallenge.com/pc/def/channel.html
+}
+
 func main() {
-	challenge4()
+	challenge5()
 }
