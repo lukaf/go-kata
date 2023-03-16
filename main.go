@@ -9,6 +9,7 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
+	"archive/zip"
 
 	"github.com/nlpodyssey/gopickle/pickle"
 	"github.com/nlpodyssey/gopickle/types"
@@ -126,7 +127,6 @@ func challenge5() {
 	if err != nil {
 		panic(err)
 	}
-
 	lines := foo.(*types.List)
 
 	for line := 0; line < lines.Len(); line++ {
@@ -143,8 +143,39 @@ func challenge5() {
 
 func challenge6() {
 	// http://www.pythonchallenge.com/pc/def/channel.html
+	zipfile, err := zip.OpenReader("channel.zip")
+	if err != nil {
+		panic(err)
+	}
+	defer zipfile.Close()
+	// fmt.Printf("%#v", zipfile)
+	currentNum := "90052"
+	
+	// fmt.Println(currentfile)
+
+//	for _, y := range zipfile.File {
+//		fmt.Println("archive content includes:", y.Name)
+//	}
+	for {
+		currentfile := fmt.Sprintf("%s.txt", currentNum)
+		f, err := zipfile.Open(currentfile)
+		if err != nil {
+			panic(err)
+		}
+
+		data, err := io.ReadAll(f)
+		if err != nil {
+			panic(err)
+		}
+		println(string(data))
+		re := regexp.MustCompile(`Next nothing is (\d+)`)
+		fmt.Println(string(data))
+		match := re.FindAllSubmatch(data, 1)
+		currentNum = string(match[0][1])
+		// TODO: Collect the comments
+	}
 }
 
 func main() {
-	challenge5()
+	challenge6()
 }
