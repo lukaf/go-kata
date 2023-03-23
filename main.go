@@ -1,15 +1,17 @@
 package main
 
 import (
+	"archive/zip"
 	"fmt"
+	"image/png"
 	"io"
+	"log"
 	"math"
 	"net/http"
 	"os"
 	"regexp"
 	"strconv"
 	"strings"
-	"archive/zip"
 
 	"github.com/nlpodyssey/gopickle/pickle"
 	"github.com/nlpodyssey/gopickle/types"
@@ -150,14 +152,16 @@ func challenge6() {
 	defer zipfile.Close()
 	// fmt.Printf("%#v", zipfile)
 	currentNum := "90052"
-	
-	// fmt.Println(currentfile)
 
-//	for _, y := range zipfile.File {
-//		fmt.Println("archive content includes:", y.Name)
-//	}
+	commentHash := map[string]string{}
+
+	for _, file := range zipfile.File {
+		commentHash[file.Name] = file.Comment
+	}
+
 	for {
 		currentfile := fmt.Sprintf("%s.txt", currentNum)
+		fmt.Printf("%s", commentHash[currentfile])
 		f, err := zipfile.Open(currentfile)
 		if err != nil {
 			panic(err)
@@ -167,15 +171,38 @@ func challenge6() {
 		if err != nil {
 			panic(err)
 		}
-		println(string(data))
 		re := regexp.MustCompile(`Next nothing is (\d+)`)
-		fmt.Println(string(data))
 		match := re.FindAllSubmatch(data, 1)
+		if len(match) < 1 {
+			break
+		}
+
 		currentNum = string(match[0][1])
-		// TODO: Collect the comments
+		f.Close()
 	}
 }
 
+func challenge7() {
+	// http://www.pythonchallenge.com/pc/def/oxygen.html
+
+	file, err := os.Open("oxygen.png")
+	if err != nil {
+		log.Fatal("Kaput")
+	}
+	defer file.Close()
+
+	image, err := png.Decode(file)
+	if err != nil {
+		fmt.Println(err)
+	}
+	x := 1
+	y := 47
+
+	colour := image.At(x, y)
+	r, g, b, a := colour.RGBA()
+	fmt.Printf("r=%v, g=%v, b=%v, a=%v", r, g, b, a)
+}
+
 func main() {
-	challenge6()
+	challenge7()
 }
