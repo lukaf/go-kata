@@ -195,12 +195,43 @@ func challenge7() {
 	if err != nil {
 		fmt.Println(err)
 	}
-	x := 1
+	bounds := image.Bounds()
 	y := 47
+	s := ""
+	for x := bounds.Min.X; x < bounds.Max.X; x+=7 {
+		colour := image.At(x, y)
+		r16, g16, b16, _ := colour.RGBA()
+		r8 := uint8(r16 >> 8)
+		g8 := uint8(g16 >> 8)
+		b8 := uint8(b16 >> 8)
 
-	colour := image.At(x, y)
-	r, g, b, a := colour.RGBA()
-	fmt.Printf("r=%v, g=%v, b=%v, a=%v", r, g, b, a)
+		// fmt.Printf("r8=%v, g8=%v, b8=%v, a8=%v\n", r8, g8, b8, a8)
+
+		if r8 == g8 && g8 == b8 {
+		s += string(r8)
+		}
+	}
+	fmt.Println(s)
+
+	start := strings.Index(s, "[")
+	end := strings.Index(s, "]")
+	if start == -1 || end == -1 {
+		fmt.Println("Could not find slice in string")
+		return
+	}
+	sliceStr := s[start+1 : end]
+	
+	// Convert slice to ASCII characters
+	asciiChars := ""
+	for _, numStr := range strings.Split(sliceStr, ", ") {
+		num, err := strconv.Atoi(numStr)
+		if err != nil {
+			log.Fatal("Kaput")
+		}
+		asciiChars += string(num)
+	}
+	fmt.Println(asciiChars)
+	
 }
 
 func main() {
